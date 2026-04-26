@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h1 class="page-title">Dashboard</h1>
+<p class="page-subtitle">All time overview</p>
+
+<!-- STAT CARDS -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="label">Total Ordered</div>
+            <div class="value">€ {{ "%.2f"|format(total_ordered) }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="border-color:#c4855a;">
+            <div class="label">Total Leftover</div>
+            <div class="value">€ {{ "%.2f"|format(total_leftover) }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="border-color:#2c8a4a;">
+            <div class="label">Total Sales</div>
+            <div class="value">€ {{ "%.2f"|format(total_sales) }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- BEST / WORST -->
+{% if best %}
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="stat-card" style="border-color:#2c8a4a;">
+            <div class="label">🏆 Best Seller</div>
+            <div class="value" style="font-size:1.4rem;">{{ best["product_name"] }}</div>
+            <div style="color:#9a7a5a; font-size:0.85rem;">{{ best["sold"] }} pieces sold</div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="stat-card" style="border-color:#c0392b;">
+            <div class="label">📉 Worst Seller</div>
+            <div class="value" style="font-size:1.4rem;">{{ worst["product_name"] }}</div>
+            <div style="color:#9a7a5a; font-size:0.85rem;">{{ worst["sold"] }} pieces sold</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- LINE CHART -->
+<h5 style="font-family:'Playfair Display',serif; color:#2c1a0e; margin-bottom:1rem;">Daily Sales</h5>
+<div class="bg-white rounded-3 p-4 shadow-sm mb-4">
+    <canvas id="lineChart" height="80"></canvas>
+</div>
+
+<!-- BAR CHART -->
+<h5 style="font-family:'Playfair Display',serif; color:#2c1a0e; margin-bottom:1rem;">Products Ranking</h5>
+<div class="bg-white rounded-3 p-4 shadow-sm mb-4">
+    <canvas id="barChart" height="80"></canvas>
+</div>
+
+<!-- PIE CHART -->
+<h5 style="font-family:'Playfair Display',serif; color:#2c1a0e; margin-bottom:1rem;">Ordered vs Leftover vs Sold</h5>
+<div class="bg-white rounded-3 p-4 shadow-sm mb-4" style="max-width:400px;">
+    <canvas id="pieChart"></canvas>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // LINE CHART — daily sales
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: {{ dates | tojson }},
+            datasets: [{
+                label: 'Daily Sales (€)',
+                data: {{ amounts | tojson }},
+                borderColor: '#e8a838',
+                backgroundColor: 'rgba(232,168,56,0.1)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#2c1a0e',
+                pointRadius: 5,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => '€ ' + v },
+                    grid: { color: '#f0e6d8' }
+                },
+                x: { grid: { color: '#f0e6d8' } }
+            }
+        }
+    });
+
+    // BAR CHART — products ranking
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ results | map(attribute='product_name') | list | tojson }},
+            datasets: [{
+                label: 'Pieces Sold',
+                data: {{ results | map(attribute='sold') | list | tojson }},
+                backgroundColor: '#2c1a0e',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f0e6d8' }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // PIE CHART — ordered vs leftover vs sold
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Total Sold (€)', 'Total Leftover (€)'],
+            datasets: [{
+                data: [{{ total_sales }}, {{ total_leftover }}],
+                backgroundColor: ['#2c8a4a', '#c0392b'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: ctx => '€ ' + ctx.parsed.toFixed(2)
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

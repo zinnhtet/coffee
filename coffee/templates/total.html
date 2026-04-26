@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <h2>Its a total page </h2>
+    <div>
+
+    <table class="table table-striped ">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Backeries</th>
+                <th>Orders</th>
+                <th>Leftover </th>
+            </tr>
+        </thead>
+        {% for sale in sales %}
+        <tbody>
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ sale.date }}</td>
+                <td>{{ sale.product_name }}</td>
+                <td>{{order_lookup[sale.product_name]}} </td>
+                <td>
+                    {{ sale.quantity }}
+                </td>
+
+            </tr>
+        </tbody>
+        {% endfor %}
+
+
+    </table>
+
+</div>
+
+<hr>
+<table class="table table-bordered w-50">
+    <tr>
+        <td>Total Ordered (buy price)</td>
+        <td>€ {{ "%.2f"|format(total_ordered) }}</td>
+    </tr>
+    <tr>
+        <td>Total Leftover</td>
+        <td>€ {{ "%.2f"|format(total_leftover) }}</td>
+    </tr>
+    <tr>
+        <td>Total Sales</td>
+        <td>€ {{ "%.2f"|format(total_sales) }}</td>
+    </tr>
+</table>
+
+<hr>
+
+{% if best %}
+<h5 style="color:green">🏆 Best Seller: {{ best["product_name"] }} — {{ best["sold"] }} sold</h5>
+{% endif %}
+
+{% if worst %}
+<h5 style="color:red">📉 Worst Seller: {{ worst["product_name"] }} — {{ worst["sold"] }} sold</h5>
+{% endif %}
+
+<form action="/sales"><button class="badge text-bg-primary rounded-pill">Calculate</button></form>
+<a href="/stats?date={{ order_date }}">View Stats</a>
+
+<button href="/">Go back to home page</button>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <h2>successful! Below is what u have just ordered ...</h2>
+    <div>
+    <table class="table table-striped ">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Backeries</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        {% for order_date, product_name, quantity, total in selected_products %}
+        <tbody>
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ order_date }}</td>
+                <td>{{ product_name }}</td>
+                <td>{{ quantity }}</td>
+                <td>{{ total }} Euro</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    <p><strong>Total Ordered:</strong> {{ total_ordered }} Euro</p>
+    <a href="/">Go back to home page</a>
+    <a href="/date">Check today's sale</a>
+</div>
+{% endblock %}

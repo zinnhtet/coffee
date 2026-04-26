@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>This shit ist running, yep !!!!!</h1><ul>
+    {% for order_date, order_product_name,leftover in calculation %}
+        {{ order_date}}, {{ order_product_name }} is {{ leftover}}
+    {% endfor %}
+</ul>
+{% endblock %}
+
+

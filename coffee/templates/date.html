@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h2> Please pick the date u wanna check! </h2>
+    <div>
+        <form action="/date" method="post">
+
+            <label for="order_date">Select date:</label>
+            <input type="date" id="order_date" name="order_date">
+            {% for option in options %}
+            <input name="select_date" type="radio" value='{{ option }}'>{{ option }}
+            {% endfor %}
+             <button type="submit">Submit</button>
+        </form>
+    </div>
+    <a href="/">Go back to home page</a>
+
+{% endblock %}
